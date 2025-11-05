@@ -1,6 +1,6 @@
 schemaVersion: 2.3.0
 metadata:
-  generateName: multicluster-redirector
+  generateName: devspaces-multicluster-redirector
 attributes:
   controller.devfile.io/storage-type: ephemeral
 components:

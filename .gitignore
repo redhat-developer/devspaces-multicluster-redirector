@@ -10,7 +10,6 @@ target/
 .classpath
 .settings/
 .factorypath
-.vscode/
 
 # macOS
 .DS_Store

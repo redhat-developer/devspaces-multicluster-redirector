@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+      "redhat.java",
+      "redhat.vscode-quarkus",
+      "github.vscode-pull-request-github",
+      "sugatoray.vscode-git-extension-pack",
+      "vscjava.vscode-maven",
+      "vscjava.vscode-java-debug",
+      "vscjava.vscode-java-test",
+      "RooVeterinaryInc.roo-cline"
+    ]
+}
