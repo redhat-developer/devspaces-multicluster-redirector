@@ -1,0 +1,21 @@
+# Java / Maven
+target/
+
+# Quarkus dev artifacts
+.quarkus/
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.settings/
+.factorypath
+.vscode/
+
+# macOS
+.DS_Store
+
+# Temporary
+app.zip
+
+
