@@ -1,3 +1,5 @@
+[![Contribute](https://www.eclipse.org/che/contribute.svg)](https://workspaces.openshift.com#https://github.com/redhat-developer/devspaces-multicluster-redirector)
+
 # Dev Spaces Multicluster Redirector
 
 This project is a simple Quarkus application that serves as a redirector for Dev Spaces in a multicluster environment.
