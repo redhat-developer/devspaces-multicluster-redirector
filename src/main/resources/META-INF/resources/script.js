@@ -50,3 +50,22 @@ function httpGetAsync(url, callback) {
     xmlHttp.open("GET", url, true);
     xmlHttp.send(null);
 }
+
+window.addEventListener('DOMContentLoaded', (event) => {
+    fetch('/api/user')
+        .then(response => response.json())
+        .then(data => {
+            const userInfo = document.getElementById('user-info');
+            if (data.user) {
+                console.log("User: ", data.user);
+                console.log("Group: ", data.group);
+
+            } else {
+                console.error('User info is not available');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching user info:', error);
+
+        });
+});

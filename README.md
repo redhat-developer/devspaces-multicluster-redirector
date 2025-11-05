@@ -42,3 +42,13 @@ mvn package -Dquarkus.container-image.build=true
 ```
 
 This will build a container image using the default container runtime (e.g., Docker or Podman).
+
+## Deploying to OpenShift
+
+The `openshift` directory contains a Kustomize configuration for deploying the application to OpenShift with an OAuth Proxy sidecar.
+
+To deploy the application, run the following command from the root of the project:
+
+```bash
+kubectl apply -k openshift
+```

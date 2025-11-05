@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devspaces-multicluster-redirector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devspaces-multicluster-redirector
+  template:
+    metadata:
+      labels:
+        app: devspaces-multicluster-redirector
+    spec:
+      containers:
+        - name: devspaces-multicluster-redirector
+          image: image-registry.openshift-image-registry.svc:5000/devspaces-multicluster-redirector/devspaces-multicluster-redirector:latest
+          ports:
+            - containerPort: 8080
+        - name: oauth-proxy
+          image: registry.redhat.io/openshift4/ose-oauth-proxy@sha256:1a49b78b534411534f712e1c38d800740559afe5b53542a3d1a54a2d12585b3a
+          ports:
+            - containerPort: 8443
+          args:
+            - "-provider=openshift"
+            - "-https-address=:8443"
+            - "-http-address="
+            - "-email-domain=*"
+            - "-upstream=http://localhost:8080"
+            - "-openshift-service-account=devspaces-multicluster-redirector"
+            - '-openshift-sar={"namespace": "default", "resource": "pods", "verb": "get"}'
+            - '-openshift-delegate-urls={"/":{"namespace": "default", "resource": "pods", "verb": "get"}}'
+            - "-client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token"
+            - "-cookie-secret-file=/etc/proxy/secrets/session_secret"
+          volumeMounts:
+            - name: session-secret
+              mountPath: /etc/proxy/secrets
+      volumes:
+        - name: session-secret
+          secret:
+            secretName: devspaces-multicluster-redirector-session-secret

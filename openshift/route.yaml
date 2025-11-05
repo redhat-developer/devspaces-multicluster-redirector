@@ -1,0 +1,12 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: devspaces-multicluster-redirector
+spec:
+  to:
+    kind: Service
+    name: devspaces-multicluster-redirector
+  port:
+    targetPort: https
+  tls:
+    termination: edge
