@@ -41,6 +41,10 @@
             <artifactId>quarkus-rest-jackson</artifactId>
             <version>${quarkus.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-container-image-jib</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>io.quarkus</groupId>
