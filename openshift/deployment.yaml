@@ -14,11 +14,11 @@ spec:
     spec:
       containers:
         - name: devspaces-multicluster-redirector
-          image: image-registry.openshift-image-registry.svc:5000/devspaces-multicluster-redirector/devspaces-multicluster-redirector:latest
+          image: quay.io/redhat-developer/devspaces-multicluster-redirector:1.0.0-SNAPSHOT
           ports:
             - containerPort: 8080
         - name: oauth-proxy
-          image: registry.redhat.io/openshift4/ose-oauth-proxy@sha256:1a49b78b534411534f712e1c38d800740559afe5b53542a3d1a54a2d12585b3a
+          image: registry.redhat.io/openshift4/ose-oauth-proxy-rhel9@sha256:4da6381f4f79de6a6024554aa99129e9b79b7ad7fdde0b0bebbcb87421a97d7c
           ports:
             - containerPort: 8443
           args:
