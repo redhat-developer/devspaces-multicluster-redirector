@@ -13,6 +13,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
         <quarkus.version>3.15.3</quarkus.version>
+        <quarkus.container-image.additional-tags>latest</quarkus.container-image.additional-tags>
     </properties>
 
     <dependencyManagement>
