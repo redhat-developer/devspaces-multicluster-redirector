@@ -8,5 +8,5 @@ roleRef:
   name: redirector-review-creator
 subjects:
 - kind: ServiceAccount
-  name: default
+  name: devspaces-multicluster-redirector
   namespace: redirector

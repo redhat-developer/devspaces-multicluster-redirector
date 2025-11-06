@@ -12,6 +12,7 @@ spec:
       labels:
         app: devspaces-multicluster-redirector
     spec:
+      serviceAccountName: devspaces-multicluster-redirector
       containers:
         - name: devspaces-multicluster-redirector
           image: quay.io/redhat-developer/devspaces-multicluster-redirector:latest
