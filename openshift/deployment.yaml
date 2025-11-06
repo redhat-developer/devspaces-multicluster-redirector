@@ -30,8 +30,8 @@ spec:
             - "-upstream=http://localhost:8080"
             - "-openshift-service-account=devspaces-multicluster-redirector"
             - "-client-id=system:serviceaccount:redirector:devspaces-multicluster-redirector"
-            - '-openshift-sar={"resource": "selfsubjectrulesreviews", "verb": "create"}'
-            - '-openshift-delegate-urls={"/":{"resource": "selfsubjectrulesreviews", "verb": "create"}}'
+            - '-openshift-sar={"nonResourceURL": "/", "verb": "get"}'
+            - '-openshift-delegate-urls={"/":{"group": "user.openshift.io", "resource": "users", "name": "~", "verb": "get"}}'
             - "-client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token"
             - "-cookie-secret-file=/etc/proxy/secrets/session_secret"
           volumeMounts:
