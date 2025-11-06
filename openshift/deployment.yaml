@@ -23,8 +23,8 @@ spec:
             - containerPort: 8443
           args:
             - "-provider=openshift"
-            - "-https-address=:8443"
-            - "-http-address="
+            - "-http-address=:8443"
+            - "-https-address="
             - "-email-domain=*"
             - "-upstream=http://localhost:8080"
             - "-openshift-service-account=devspaces-multicluster-redirector"
@@ -32,8 +32,6 @@ spec:
             - '-openshift-delegate-urls={"/":{"namespace": "default", "resource": "pods", "verb": "get"}}'
             - "-client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token"
             - "-cookie-secret-file=/etc/proxy/secrets/session_secret"
-            - "-tls-cert-file=/etc/tls/private/tls.crt"
-            - "-tls-key-file=/etc/tls/private/tls.key"
           volumeMounts:
             - name: session-secret
               mountPath: /etc/proxy/secrets
