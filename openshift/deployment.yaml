@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: devspaces-multicluster-redirector
-          image: quay.io/redhat-developer/devspaces-multicluster-redirector:1.0.0-SNAPSHOT
+          image: quay.io/redhat-developer/devspaces-multicluster-redirector:latest
           ports:
             - containerPort: 8080
         - name: oauth-proxy
@@ -32,6 +32,8 @@ spec:
             - '-openshift-delegate-urls={"/":{"namespace": "default", "resource": "pods", "verb": "get"}}'
             - "-client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token"
             - "-cookie-secret-file=/etc/proxy/secrets/session_secret"
+            - "-tls-cert-file=/etc/tls/private/tls.crt"
+            - "-tls-key-file=/etc/tls/private/tls.key"
           volumeMounts:
             - name: session-secret
               mountPath: /etc/proxy/secrets

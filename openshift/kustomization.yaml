@@ -5,3 +5,5 @@ resources:
   - service.yaml
   - route.yaml
   - secrets.yaml
+  - clusterrole.yaml
+  - clusterrolebinding.yaml
