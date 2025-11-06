@@ -29,6 +29,7 @@ spec:
             - "-email-domain=*"
             - "-upstream=http://localhost:8080"
             - "-openshift-service-account=devspaces-multicluster-redirector"
+            - "-client-id=system:serviceaccount:redirector:devspaces-multicluster-redirector"
             - '-openshift-sar={"namespace": "default", "resource": "pods", "verb": "get"}'
             - '-openshift-delegate-urls={"/":{"namespace": "default", "resource": "pods", "verb": "get"}}'
             - "-client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token"
