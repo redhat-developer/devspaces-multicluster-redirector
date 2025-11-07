@@ -22,16 +22,26 @@ spec:
           image: registry.redhat.io/openshift4/ose-oauth-proxy-rhel9@sha256:4da6381f4f79de6a6024554aa99129e9b79b7ad7fdde0b0bebbcb87421a97d7c
           ports:
             - containerPort: 8443
-          args:
-            - "-provider=openshift"
-            - "-http-address=:8443"
-            - "-https-address="
-            - "-email-domain=*"
-            - "-upstream=http://localhost:8080"
-            - "-openshift-service-account=devspaces-multicluster-redirector"
-            - "-scope=user:info"
-            - "-client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token"
-            - "-cookie-secret-file=/etc/proxy/secrets/session_secret"
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          command:
+            - /bin/sh
+            - -c
+            - |
+              exec /usr/bin/oauth-proxy \
+                -provider=openshift \
+                -http-address=:8443 \
+                -https-address= \
+                -email-domain=* \
+                -upstream=http://localhost:8080 \
+                -openshift-service-account=devspaces-multicluster-redirector \
+                -client-id=system:serviceaccount:${NAMESPACE}:devspaces-multicluster-redirector \
+                -scope=user:info \
+                -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token \
+                -cookie-secret-file=/etc/proxy/secrets/session_secret
           volumeMounts:
             - name: session-secret
               mountPath: /etc/proxy/secrets
