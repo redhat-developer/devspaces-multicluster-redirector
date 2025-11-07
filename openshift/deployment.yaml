@@ -37,9 +37,9 @@ spec:
                 -https-address= \
                 -email-domain=* \
                 -upstream=http://localhost:8080 \
+                -scope=user:info \
                 -openshift-service-account=devspaces-multicluster-redirector \
                 -client-id=system:serviceaccount:${NAMESPACE}:devspaces-multicluster-redirector \
-                -scope=user:info \
                 -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token \
                 -cookie-secret-file=/etc/proxy/secrets/session_secret
           volumeMounts:
