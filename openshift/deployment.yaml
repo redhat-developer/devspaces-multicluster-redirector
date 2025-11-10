@@ -18,6 +18,10 @@ spec:
           image: quay.io/redhat-developer/devspaces-multicluster-redirector:latest
           ports:
             - containerPort: 8080
+          volumeMounts:
+            - name: group-mapping
+              mountPath: /etc/config
+              readOnly: true
         - name: oauth-proxy
           image: registry.redhat.io/openshift4/ose-oauth-proxy-rhel9@sha256:4da6381f4f79de6a6024554aa99129e9b79b7ad7fdde0b0bebbcb87421a97d7c
           ports:
@@ -50,3 +54,6 @@ spec:
         - name: session-secret
           secret:
             secretName: devspaces-multicluster-redirector-session-secret
+        - name: group-mapping
+          configMap:
+            name: devspaces-openshift-group-mapping

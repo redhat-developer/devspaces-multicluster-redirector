@@ -8,3 +8,4 @@ resources:
   - clusterrole.yaml
   - clusterrolebinding.yaml
   - serviceaccount.yaml
+  - configmap.yaml

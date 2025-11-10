@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: devspaces-openshift-group-mapping
+data:
+  # JSON format mapping between OpenShift groups and Dev Spaces URLs
+  group-mapping.json: |
+    {
+      "developers": "https://devspaces-cluster1.example.com",
+      "qa-team": "https://devspaces-cluster2.example.com",
+      "production": "https://devspaces-cluster3.example.com"
+    }
