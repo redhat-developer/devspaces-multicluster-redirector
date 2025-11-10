@@ -56,8 +56,15 @@ let groupMapping = {};
 
 // Load group mapping on startup
 window.addEventListener('DOMContentLoaded', (event) => {
-    // Load group mapping first
-    fetch('/api/group-mapping')
+    // Load group mapping first with cache-busting
+    fetch('/api/group-mapping', {
+        cache: 'no-store',
+        headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        }
+    })
         .then(response => response.json())
         .then(data => {
             groupMapping = data;

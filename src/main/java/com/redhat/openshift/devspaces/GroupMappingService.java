@@ -22,12 +22,20 @@ public class GroupMappingService {
     /**
      * Read the ConfigMap file and return the group mapping
      * This is called on every request to ensure we always have the latest version
+     * Resolves symlinks to get the actual file (Kubernetes updates ConfigMaps via symlinks)
      */
     private Map<String, String> readGroupMapping() {
         try {
             Path configPath = Paths.get(CONFIG_PATH);
-            if (Files.exists(configPath)) {
-                String jsonContent = Files.readString(configPath);
+            
+            // Resolve symlink to get the actual file (Kubernetes uses symlinks for ConfigMap updates)
+            Path realPath = configPath.toRealPath();
+            
+            if (Files.exists(realPath)) {
+                // Force a fresh read by reading bytes and converting to string
+                // This bypasses any potential caching
+                byte[] bytes = Files.readAllBytes(realPath);
+                String jsonContent = new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
                 return objectMapper.readValue(jsonContent, 
                     new TypeReference<Map<String, String>>() {});
             } else {
