@@ -51,14 +51,31 @@ function httpGetAsync(url, callback) {
     xmlHttp.send(null);
 }
 
+// Group mapping loaded on startup
+let groupMapping = {};
+
+// Load group mapping on startup
 window.addEventListener('DOMContentLoaded', (event) => {
+    // Load group mapping first
+    fetch('/api/group-mapping')
+        .then(response => response.json())
+        .then(data => {
+            groupMapping = data;
+            console.log("Group mapping loaded:", groupMapping);
+        })
+        .catch(error => {
+            console.error('Error fetching group mapping:', error);
+        });
+
+    // Load user info
     fetch('/api/user')
         .then(response => response.json())
         .then(data => {
             const userInfo = document.getElementById('user-info');
             if (data.user) {
                 console.log("User: ", data.user);
-                console.log("Group: ", data.group);
+                console.log("Groups: ", data.groups);
+                console.log("Dev Spaces Mappings: ", data.devSpacesMappings);
 
             } else {
                 console.error('User info is not available');
