@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Path("/api/user")
@@ -21,6 +20,9 @@ public class UserInfoResource {
 
     @Inject
     GroupMappingService groupMappingService;
+
+    @Inject
+    OpenShiftGroupService openShiftGroupService;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -33,22 +35,42 @@ public class UserInfoResource {
         userInfo.put("user", user);
         userInfo.put("groups", groupsHeader);
 
-        // Parse groups and find matching Dev Spaces URLs
-        if (groupsHeader != null && !groupsHeader.isEmpty()) {
-            List<String> groups = Arrays.asList(groupsHeader.split(","));
+        // Get all groups from OpenShift cluster
+        List<String> allOpenShiftGroups = openShiftGroupService.getAllGroups();
+        ArrayNode allGroupsArray = mapper.createArrayNode();
+        for (String group : allOpenShiftGroups) {
+            allGroupsArray.add(group);
+        }
+        userInfo.set("allOpenShiftGroups", allGroupsArray);
+
+        // Get all groups from ConfigMap
+        java.util.Map<String, String> configMapMappings = groupMappingService.getAllMappings();
+        ArrayNode configMapGroupsArray = mapper.createArrayNode();
+        for (String group : configMapMappings.keySet()) {
+            configMapGroupsArray.add(group);
+        }
+        userInfo.set("configMapGroups", configMapGroupsArray);
+
+        // Check which OpenShift groups the user belongs to and match with ConfigMap
+        if (user != null && !user.isEmpty()) {
+            List<String> userGroups = openShiftGroupService.getUserGroups(user);
+            ArrayNode userGroupsArray = mapper.createArrayNode();
+            for (String group : userGroups) {
+                userGroupsArray.add(group);
+            }
+            userInfo.set("userOpenShiftGroups", userGroupsArray);
+
+            // Find matching Dev Spaces URLs for user's groups
             ArrayNode devSpacesMappings = mapper.createArrayNode();
-            
-            for (String group : groups) {
-                String trimmedGroup = group.trim();
-                String devSpacesUrl = groupMappingService.getDevSpacesUrl(trimmedGroup);
+            for (String group : userGroups) {
+                String devSpacesUrl = groupMappingService.getDevSpacesUrl(group);
                 if (devSpacesUrl != null) {
                     ObjectNode mapping = mapper.createObjectNode();
-                    mapping.put("group", trimmedGroup);
+                    mapping.put("group", group);
                     mapping.put("devSpacesUrl", devSpacesUrl);
                     devSpacesMappings.add(mapping);
                 }
             }
-            
             userInfo.set("devSpacesMappings", devSpacesMappings);
         }
 

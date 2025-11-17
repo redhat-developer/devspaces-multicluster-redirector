@@ -22,5 +22,7 @@ rules:
   - user.openshift.io
   resources:
   - users
+  - groups
   verbs:
   - get
+  - list
