@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,11 +19,13 @@ public class GroupMappingService {
     private static final Logger LOG = Logger.getLogger(GroupMappingService.class);
     private static final String CONFIG_PATH = "/etc/config/group-mapping.json";
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private FileTime lastKnownModificationTime = null;
 
     /**
      * Read the ConfigMap file and return the group mapping
      * This is called on every request to ensure we always have the latest version
      * Resolves symlinks to get the actual file (Kubernetes updates ConfigMaps via symlinks)
+     * Includes a retry mechanism if the file appears to have been recently updated
      */
     private Map<String, String> readGroupMapping() {
         try {
@@ -32,6 +35,24 @@ public class GroupMappingService {
             Path realPath = configPath.toRealPath();
             
             if (Files.exists(realPath)) {
+                // Check if file modification time has changed (indicates ConfigMap update)
+                FileTime currentModTime = Files.getLastModifiedTime(realPath);
+                
+                // If we detect a recent change, wait a bit and retry to ensure Kubernetes has finished updating
+                if (lastKnownModificationTime != null && 
+                    currentModTime.compareTo(lastKnownModificationTime) > 0) {
+                    LOG.infof("ConfigMap file modification time changed, waiting for update to complete...");
+                    try {
+                        Thread.sleep(100); // Small delay to let Kubernetes finish the update
+                        // Re-resolve the path in case symlink changed
+                        realPath = configPath.toRealPath();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+                
+                lastKnownModificationTime = Files.getLastModifiedTime(realPath);
+                
                 // Force a fresh read by reading bytes and converting to string
                 // This bypasses any potential caching
                 byte[] bytes = Files.readAllBytes(realPath);
