@@ -1,4 +1,5 @@
 [![Contribute](https://www.eclipse.org/che/contribute.svg)](https://workspaces.openshift.com#https://github.com/redhat-developer/devspaces-multicluster-redirector)
+[![Repository on Quay](https://quay.io/repository/redhat-developer/devspaces-multicluster-redirector/status "Repository on Quay")](https://quay.io/repository/redhat-developer/devspaces-multicluster-redirector)
 
 # Dev Spaces Multicluster Redirector
 
