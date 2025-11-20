@@ -101,6 +101,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         redirect(devSpacesUrl);
                         return; // Exit early since we're redirecting
                     }
+                } else {
+                    showError("User '" + data.user + "' is not allowed to access any of the configured Red Hat OpenShift Dev Spaces instances.");
                 }
             } else {
                 console.error('User info is not available');
@@ -108,6 +110,5 @@ window.addEventListener('DOMContentLoaded', (event) => {
         })
         .catch(error => {
             console.error('Error fetching user info:', error);
-
         });
 });
