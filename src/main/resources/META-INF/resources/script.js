@@ -97,6 +97,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     const devSpacesUrl = data.devSpacesMappings[0].devSpacesUrl;
                     if (devSpacesUrl) {
                         console.log("Redirecting to Dev Spaces URL: ", devSpacesUrl);
+                        show("loading-devspaces-text");
                         redirect(devSpacesUrl);
                         return; // Exit early since we're redirecting
                     }
