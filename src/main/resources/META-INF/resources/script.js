@@ -21,14 +21,14 @@ console.log("Query: ", query);
 console.log("Hash: ", hash);
 
 // Shows state content.
-// Given Id needs to be one of 'loading-devspaces-text', 'register-developer-sandbox-text', 'error-text' or 'verify-account-text'.
+// Given Id needs to be one of 'loading-devspaces-text', 'error-text'
 function show(elementId) {
     console.log('showing element: ' + elementId);
     document.getElementById(elementId).style.display = 'block';
 }
 
 // Hides state content.
-// Given Id needs to be one of 'loading-devspaces-text', 'register-developer-sandbox-text' or 'error-text'.
+// Given Id needs to be one of 'loading-devspaces-text', 'error-text'
 function hide(elementId) {
     console.log('hiding element: ' + elementId);
     document.getElementById(elementId).style.display = 'none';
