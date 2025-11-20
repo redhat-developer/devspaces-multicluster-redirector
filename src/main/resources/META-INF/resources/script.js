@@ -34,6 +34,14 @@ function hide(elementId) {
     document.getElementById(elementId).style.display = 'none';
 }
 
+// Hides all state content.
+function hideAll() {
+    console.log('hiding all...');
+    document.getElementById('loading-devspaces-text').style.display = 'none';
+    document.getElementById('error-text').style.display = 'none';
+    document.getElementById('error-status').style.display = 'none';
+  }
+
 function showError(errorText) {
   hideAll();
   show('error-text');
