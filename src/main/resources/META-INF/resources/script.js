@@ -40,6 +40,7 @@ function hideAll() {
     document.getElementById('loading-devspaces-text').style.display = 'none';
     document.getElementById('error-text').style.display = 'none';
     document.getElementById('error-status').style.display = 'none';
+    document.getElementById('devspaces-selection').style.display = 'none';
   }
 
 function showError(errorText) {
@@ -55,6 +56,32 @@ function redirect(url) {
     setTimeout(function() {
         window.location.href = url;
     }, 2000);
+}
+
+// Shows Dev Spaces selection UI when multiple instances are available
+function showDevSpacesSelection(mappings) {
+    hideAll();
+    const selectionDiv = document.getElementById('devspaces-selection');
+    const optionsDiv = document.getElementById('devspaces-options');
+    
+    // Clear any existing options
+    optionsDiv.innerHTML = '';
+    
+    // Create a button for each Dev Spaces instance
+    mappings.forEach((mapping, index) => {
+        const button = document.createElement('button');
+        button.className = 'devspaces-option-button';
+        button.textContent = mapping.group || `Dev Spaces Instance ${index + 1}`;
+        button.onclick = function() {
+            console.log("Selected Dev Spaces URL: ", mapping.devSpacesUrl);
+            selectionDiv.style.display = 'none';
+            show("loading-devspaces-text");
+            redirect(mapping.devSpacesUrl);
+        };
+        optionsDiv.appendChild(button);
+    });
+    
+    selectionDiv.style.display = 'block';
 }
 
 function httpGetAsync(url, callback) {
@@ -101,15 +128,24 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 console.log("Dev Spaces Mappings: ", data.devSpacesMappings);
 
                 // Check if there's exactly one Dev Spaces URL, redirect to it
-                if (data.devSpacesMappings && Array.isArray(data.devSpacesMappings) && data.devSpacesMappings.length === 1) {
-                    const devSpacesUrl = data.devSpacesMappings[0].devSpacesUrl;
-                    if (devSpacesUrl) {
-                        console.log("Redirecting to Dev Spaces URL: ", devSpacesUrl);
-                        show("loading-devspaces-text");
-                        redirect(devSpacesUrl);
-                        return; // Exit early since we're redirecting
+                if (data.devSpacesMappings && Array.isArray(data.devSpacesMappings)) {
+                    if (data.devSpacesMappings.length === 1) {
+                        const devSpacesUrl = data.devSpacesMappings[0].devSpacesUrl;
+                        if (devSpacesUrl) {
+                            console.log("Redirecting to Dev Spaces URL: ", devSpacesUrl);
+                            show("loading-devspaces-text");
+                            redirect(devSpacesUrl);
+                            return; // Exit early since we're redirecting
+                        }
+                    } else if (data.devSpacesMappings.length > 1) {
+                        // Show selection UI for multiple Dev Spaces
+                        showDevSpacesSelection(data.devSpacesMappings);
+                        return;
                     }
-                } else {
+                }
+                
+                // No Dev Spaces mappings found
+                if (!data.devSpacesMappings || data.devSpacesMappings.length === 0) {
                     showError("User '" + data.user + "' is not allowed to access any of the configured Red Hat OpenShift Dev Spaces instances.");
                 }
             } else {

@@ -67,3 +67,39 @@ p {
   font-weight: 500; 
   color: #bbb;
 }
+
+#devspaces-selection {
+  position: relative;
+  top: 50%;
+  margin-top: 100px;
+}
+
+#devspaces-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.devspaces-option-button {
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  min-width: 300px;
+  transition: background-color 0.3s ease;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.devspaces-option-button:hover {
+  background-color: #0052a3;
+}
+
+.devspaces-option-button:active {
+  background-color: #003d7a;
+}
