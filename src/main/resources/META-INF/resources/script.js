@@ -41,6 +41,14 @@ function showError(errorText) {
   document.getElementById('error-status').textContent = errorText;
 }
 
+// Redirects to the URL after 2 seconds
+function redirect(url) {
+    console.log("Redirect URL: ", url)
+    setTimeout(function() {
+        window.location.href = url;
+    }, 2000);
+}
+
 function httpGetAsync(url, callback) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function() {
@@ -89,7 +97,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     const devSpacesUrl = data.devSpacesMappings[0].devSpacesUrl;
                     if (devSpacesUrl) {
                         console.log("Redirecting to Dev Spaces URL: ", devSpacesUrl);
-                        window.location.href = devSpacesUrl;
+                        redirect(devSpacesUrl);
                         return; // Exit early since we're redirecting
                     }
                 }
