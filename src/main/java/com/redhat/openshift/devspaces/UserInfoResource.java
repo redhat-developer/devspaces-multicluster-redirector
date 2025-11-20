@@ -27,33 +27,17 @@ public class UserInfoResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserInfo(@Context HttpHeaders headers) {
-        String user = headers.getHeaderString("X-Forwarded-User");
+        String userHeader = headers.getHeaderString("X-Forwarded-User");
         String groupsHeader = headers.getHeaderString("X-Forwarded-Groups");
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode userInfo = mapper.createObjectNode();
-        userInfo.put("user", user);
+        userInfo.put("user", userHeader);
         userInfo.put("groups", groupsHeader);
 
-        // Get all groups from OpenShift cluster
-        List<String> allOpenShiftGroups = openShiftGroupService.getAllGroups();
-        ArrayNode allGroupsArray = mapper.createArrayNode();
-        for (String group : allOpenShiftGroups) {
-            allGroupsArray.add(group);
-        }
-        userInfo.set("allOpenShiftGroups", allGroupsArray);
-
-        // Get all groups from ConfigMap
-        java.util.Map<String, String> configMapMappings = groupMappingService.getAllMappings();
-        ArrayNode configMapGroupsArray = mapper.createArrayNode();
-        for (String group : configMapMappings.keySet()) {
-            configMapGroupsArray.add(group);
-        }
-        userInfo.set("configMapGroups", configMapGroupsArray);
-
         // Check which OpenShift groups the user belongs to and match with ConfigMap
-        if (user != null && !user.isEmpty()) {
-            List<String> userGroups = openShiftGroupService.getUserGroups(user);
+        if (userHeader != null && !userHeader.isEmpty()) {
+            List<String> userGroups = openShiftGroupService.getUserGroups(userHeader);
             ArrayNode userGroupsArray = mapper.createArrayNode();
             for (String group : userGroups) {
                 userGroupsArray.add(group);

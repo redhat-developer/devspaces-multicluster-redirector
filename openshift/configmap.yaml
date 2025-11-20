@@ -6,7 +6,9 @@ data:
   # JSON format mapping between OpenShift groups and Dev Spaces URLs
   group-mapping.json: |
     {
-      "developers": "https://devspaces-cluster1.example.com",
-      "qa-team": "https://devspaces-cluster2.example.com",
-      "production": "https://devspaces-cluster3.example.com"
+      "che-team-a": "https://devspaces-cluster1.example.com",
+      "che-team-b": "https://devspaces-cluster2.example.com",
+      "che-team-c": "https://devspaces-cluster3.example.com",
+      "che-docs": "https://devspaces-cluster4.example.com",
+      "interns": "https://workspaces.openshift.com"
     }
