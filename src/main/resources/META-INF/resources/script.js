@@ -52,9 +52,22 @@ function showError(errorText) {
 
 // Redirects to the URL after 2 seconds
 function redirect(url) {
-    console.log("Redirect URL: ", url)
+    // Append hash/anchor if it exists in the original URL
+    let redirectUrl = url;
+    if (hash) {
+        // Check if the URL already has a hash
+        const hashIndex = url.indexOf('#');
+        if (hashIndex === -1) {
+            // No hash in URL, append the original hash
+            redirectUrl = url + hash;
+        } else {
+            // URL already has a hash, replace it with the original hash
+            redirectUrl = url.substring(0, hashIndex) + hash;
+        }
+    }
+    console.log("Redirect URL: ", redirectUrl)
     setTimeout(function() {
-        window.location.href = url;
+        window.location.href = redirectUrl;
     }, 2000);
 }
 
