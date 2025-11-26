@@ -52,19 +52,70 @@ function showError(errorText) {
 
 // Redirects to the URL after 2 seconds
 function redirect(url) {
-    // Append hash/anchor if it exists in the original URL
+    // Build redirect URL preserving pathname, query, and hash from original URL
     let redirectUrl = url;
-    if (hash) {
-        // Check if the URL already has a hash
+    
+    try {
+        // Parse the base URL
+        const urlObj = new URL(url);
+        
+        // Append pathname if it exists and is not just "/"
+        if (path && path !== '/') {
+            // Replace any existing path with the original path
+            urlObj.pathname = path;
+        }
+        
+        // Append query string if it exists
+        if (query) {
+            // If URL already has query params, merge them, otherwise just append
+            if (urlObj.search) {
+                urlObj.search = urlObj.search + (urlObj.search.endsWith('&') ? '' : '&') + query.substring(1);
+            } else {
+                urlObj.search = query;
+            }
+        }
+        
+        // Append hash/anchor if it exists in the original URL
+        if (hash) {
+            urlObj.hash = hash;
+        }
+        
+        redirectUrl = urlObj.toString();
+    } catch (e) {
+        // If URL parsing fails (e.g., relative URL), use string manipulation
+        console.warn("Failed to parse URL, using string manipulation:", e);
+        
+        // Remove hash and query from base URL if they exist
         const hashIndex = url.indexOf('#');
-        if (hashIndex === -1) {
-            // No hash in URL, append the original hash
-            redirectUrl = url + hash;
-        } else {
-            // URL already has a hash, replace it with the original hash
-            redirectUrl = url.substring(0, hashIndex) + hash;
+        const queryIndex = url.indexOf('?');
+        let baseUrl = url;
+        
+        // Find the end of the base URL (before query or hash)
+        let urlEnd = url.length;
+        if (hashIndex !== -1) urlEnd = Math.min(urlEnd, hashIndex);
+        if (queryIndex !== -1) urlEnd = Math.min(urlEnd, queryIndex);
+        baseUrl = url.substring(0, urlEnd);
+        
+        // Build redirect URL with path, query, and hash
+        redirectUrl = baseUrl;
+        
+        // Append pathname if it exists and is not just "/"
+        if (path && path !== '/') {
+            // Remove trailing slash from base URL if present, then append path
+            redirectUrl = baseUrl.replace(/\/$/, '') + path;
+        }
+        
+        // Append query string if it exists
+        if (query) {
+            redirectUrl += query;
+        }
+        
+        // Append hash if it exists
+        if (hash) {
+            redirectUrl += hash;
         }
     }
+    
     console.log("Redirect URL: ", redirectUrl)
     setTimeout(function() {
         window.location.href = redirectUrl;
