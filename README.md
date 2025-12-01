@@ -1,4 +1,5 @@
 [![Contribute](https://www.eclipse.org/che/contribute.svg)](https://workspaces.openshift.com#https://github.com/redhat-developer/devspaces-multicluster-redirector)
+[![Contribute (nightly)](https://img.shields.io/static/v1?label=nightly%20Che&message=for%20maintainers&logo=eclipseche&color=FDB940&labelColor=525C86)](https://che-dogfooding.apps.che-dev.x6e0.p1.openshiftapps.com#https://github.com/redhat-developer/devspaces-multicluster-redirector)
 [![Repository on Quay](https://quay.io/repository/redhat-developer/devspaces-multicluster-redirector/status "Repository on Quay")](https://quay.io/repository/redhat-developer/devspaces-multicluster-redirector)
 
 # Dev Spaces Multicluster Redirector
