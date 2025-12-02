@@ -33,3 +33,10 @@ commands:
       commandLine: |
         kubectl apply -k openshift
       workingDir: ${PROJECT_SOURCE}
+        - id: deploy
+    exec:
+      label: "3. Clean Up"
+      component: tools
+      commandLine: |
+        kubectl delete -k openshift
+      workingDir: ${PROJECT_SOURCE}
