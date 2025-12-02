@@ -18,21 +18,18 @@ components:
 commands:
   - id: package
     exec:
-      label: "Package"
+      label: "1. Package"
       component: tools
-      commandLine: "mvn clean package -DskipTests=true"
+      workingDir: ${PROJECT_SOURCE}
+      commandLine: |
+        mvn clean package
       group:
         kind: build
         isDefault: true
-  - id: runtests
-    exec:
-      label: "Run Tests"
-      component: tools
-      commandLine: "mvn test"
-      group:
-        kind: test
   - id: deploy
     exec:
-      label: "Deploy"
+      label: "2. Deploy"
       component: tools
-      commandLine: "kubectl apply -k openshift -n redirector"
+      commandLine: |
+        kubectl apply -k openshift
+      workingDir: ${PROJECT_SOURCE}
