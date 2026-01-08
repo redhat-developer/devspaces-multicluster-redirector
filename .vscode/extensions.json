@@ -1,5 +1,6 @@
 {
     "recommendations": [
+      "Anthropic.claude-code",
       "redhat.java",
       "redhat.vscode-quarkus",
       "github.vscode-pull-request-github",
