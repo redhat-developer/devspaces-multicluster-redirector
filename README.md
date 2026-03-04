@@ -129,7 +129,8 @@ mvn package -Dquarkus.container-image.build=true
 The `openshift/` directory contains Kustomize configuration files:
 
 ```bash
-kubectl apply -k openshift
+oc new-project redirector
+kubectl apply -k openshift -n redirector
 ```
 
 This creates:
