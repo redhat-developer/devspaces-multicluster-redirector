@@ -5,7 +5,7 @@
 
 # Dev Spaces Multicluster Redirector
 
-A Quarkus-based intelligent routing service that automatically redirects users to their designated Red Hat OpenShift Dev Spaces instance based on their OpenShift group membership. This enables organizations to manage multiple Dev Spaces clusters and seamlessly route users to the appropriate instance.
+A Quarkus-based intelligent routing service that automatically redirects users to their designated Red Hat OpenShift Dev Spaces instance based on their OpenShift group membership. This enables organizations to manage multiple Dev Spaces clusters and seamlessly route users to the appropriate instance. More details can be found at the [Enterprise multi-cluster scalability with OpenShift Dev Spaces](https://developers.redhat.com/articles/2026/01/23/enterprise-multi-cluster-scalability-openshift-dev-spaces) blog post.
 
 ## 🎯 Overview
 
