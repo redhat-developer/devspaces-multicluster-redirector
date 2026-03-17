@@ -122,6 +122,21 @@ mvn package -Dquarkus.container-image.build=true
 ### Prerequisites
 
 1. **Service Account**: The application requires a service account with permissions to list and read OpenShift groups
+
+   > **IMPORTANT**: The Service Account **must** be configured with the `serviceaccounts.openshift.io/oauth-redirecturi.primary` annotation. This annotation specifies the OAuth callback URL that the OAuth Proxy will use for authentication. Without this annotation, the OAuth authentication flow will fail.
+   >
+   > Example (see [`openshift/serviceaccount.yaml`](openshift/serviceaccount.yaml)):
+   > ```yaml
+   > apiVersion: v1
+   > kind: ServiceAccount
+   > metadata:
+   >   name: devspaces-multicluster-redirector
+   >   annotations:
+   >     serviceaccounts.openshift.io/oauth-redirecturi.primary: "https://your-multicluster-redirector-route-url/oauth/callback"
+   > ```
+   >
+   > Replace `your-route-url` with your actual OpenShift Route URL.
+
 2. **ConfigMap**: Create a ConfigMap with group-to-URL mappings
 3. **OAuth Proxy**: Configured for OpenShift authentication
 
