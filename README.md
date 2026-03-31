@@ -2,6 +2,7 @@
 [![Contribute (nightly)](https://img.shields.io/static/v1?label=nightly%20Che&message=for%20maintainers&logo=eclipseche&color=FDB940&labelColor=525C86)](https://che-dogfooding.apps.che-dev.x6e0.p1.openshiftapps.com#https://github.com/redhat-developer/devspaces-multicluster-redirector)
 [![Upstream](https://img.shields.io/badge/Quay.io-redhat--developer-blue?logo=quay&logoColor=white)](https://quay.io/repository/redhat-developer/devspaces-multicluster-redirector)
 [![Midstream](https://img.shields.io/badge/Quay.io-redhat--user--workloads-blue?logo=quay&logoColor=white)](https://quay.io/repository/redhat-user-workloads/devspaces-tenant/devspaces/multicluster-redirector-rhel9)
+[![Production](https://img.shields.io/badge/Red%20Hat%20Catalog-Production-red?logo=redhat&logoColor=white)](https://catalog.redhat.com/en/search?q=Multicluster+redirector&searchType=Containers)
 
 # Dev Spaces Multicluster Redirector
 
@@ -119,6 +120,36 @@ mvn package -Dquarkus.container-image.build=true
 
 ## 📦 Deploying to OpenShift
 
+### Container Images
+
+Two container images are available:
+
+**Upstream (Development/Latest)**
+- **Registry**: `quay.io/redhat-developer/devspaces-multicluster-redirector`
+- **Use case**: Development, testing, and early access to new features
+- **Tags**: `latest`, specific version tags
+
+**Downstream (Production/Red Hat Certified)**
+- **Registry**: `registry.redhat.io/devspaces/multicluster-redirector-rhel9`
+- **Use case**: Production deployments, enterprise support
+- **Catalog**: [Red Hat Ecosystem Catalog](https://catalog.redhat.com/en/software/containers/devspaces/multicluster-redirector-rhel9/69a1b8d94d1e7c99baa33970)
+- **Tags**: Version-specific tags (e.g., `3.27`)
+- **Access**: Requires Red Hat account and active OpenShift subscription
+
+To use the production Red Hat image, authenticate and pull:
+
+```bash
+# Authenticate to Red Hat registry (one-time setup)
+podman login registry.redhat.io
+
+# Pull the image
+podman pull registry.redhat.io/devspaces/multicluster-redirector-rhel9:latest
+
+# Or update the deployment
+oc set image deployment/devspaces-multicluster-redirector \
+  devspaces-multicluster-redirector=registry.redhat.io/devspaces/multicluster-redirector-rhel9:latest
+```
+
 ### Prerequisites
 
 1. **Service Account**: The application requires a service account with permissions to list and read OpenShift groups
@@ -158,6 +189,25 @@ This creates:
 - **Deployment**: Application with OAuth proxy sidecar
 - **Service**: Internal service on port 8443
 - **Route**: External HTTPS access
+
+#### Using Production Image
+
+For production deployments, modify `openshift/deployment.yaml` to use the Red Hat certified image before applying:
+
+```yaml
+containers:
+  - name: devspaces-multicluster-redirector
+    image: registry.redhat.io/devspaces/multicluster-redirector-rhel9:latest  # Use specific version tag in production
+    ports:
+      - containerPort: 8080
+```
+
+Or patch an existing deployment:
+
+```bash
+oc patch deployment devspaces-multicluster-redirector \
+  -p '{"spec":{"template":{"spec":{"containers":[{"name":"devspaces-multicluster-redirector","image":"registry.redhat.io/devspaces/multicluster-redirector-rhel9:latest"}]}}}}'
+```
 
 ### Configuration
 
