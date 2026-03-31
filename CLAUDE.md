@@ -48,6 +48,19 @@ mvn package -Dquarkus.container-image.build=true
 kubectl apply -k openshift
 ```
 
+**Container Images:**
+- **Development (Upstream):** `quay.io/redhat-developer/devspaces-multicluster-redirector:latest`
+- **Production (Downstream):** `registry.redhat.io/devspaces/multicluster-redirector-rhel9:latest`
+  - Red Hat certified image from [Red Hat Ecosystem Catalog](https://catalog.redhat.com/en/software/containers/devspaces/multicluster-redirector-rhel9/69a1b8d94d1e7c99baa33970)
+  - Use specific version tags (e.g., `3.27`) or digest in production
+  - Requires authentication: `podman login registry.redhat.io`
+
+To use the production image, update `openshift/deployment.yaml` line 18 or patch:
+```bash
+oc set image deployment/devspaces-multicluster-redirector \
+  devspaces-multicluster-redirector=registry.redhat.io/devspaces/multicluster-redirector-rhel9:latest
+```
+
 ### Clean Up OpenShift Resources
 ```bash
 kubectl delete -k openshift
