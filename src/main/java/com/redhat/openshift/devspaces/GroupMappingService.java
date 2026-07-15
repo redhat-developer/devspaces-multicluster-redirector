@@ -10,7 +10,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 @ApplicationScoped
@@ -70,13 +73,32 @@ public class GroupMappingService {
     }
 
     /**
-     * Get the Dev Spaces URL for a given OpenShift group
-     * @param groupName The OpenShift group name
-     * @return The Dev Spaces URL, or null if not found
+     * Returns true if the user belongs to all groups listed in the given key.
+     * Keys may be comma-separated (e.g. "team-alpha, team-beta"), requiring membership in all named groups.
      */
-    public String getDevSpacesUrl(String groupName) {
-        Map<String, String> mapping = readGroupMapping();
-        return mapping.get(groupName);
+    static boolean matchesAllGroups(String groupKey, List<String> userGroups) {
+        return Arrays.stream(groupKey.split(","))
+                .map(String::trim)
+                .filter(g -> !g.isEmpty())
+                .allMatch(userGroups::contains);
+    }
+
+    /**
+     * Returns all ConfigMap entries whose key (possibly a comma-separated group list)
+     * matches the user's groups using AND logic. Preserves ConfigMap insertion order.
+     *
+     * @param userGroups the groups the user belongs to
+     * @return map of matched group-key → Dev Spaces URL
+     */
+    public Map<String, String> getMatchingMappings(List<String> userGroups) {
+        Map<String, String> allMappings = readGroupMapping();
+        Map<String, String> result = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : allMappings.entrySet()) {
+            if (matchesAllGroups(entry.getKey(), userGroups)) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return result;
     }
 
     /**

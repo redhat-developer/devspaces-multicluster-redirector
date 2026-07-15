@@ -83,7 +83,9 @@ kubectl delete -k openshift
 - Reads ConfigMap from `/etc/config/group-mapping.json` on every request
 - Handles Kubernetes symlink-based ConfigMap updates with retry logic
 - Tracks file modification times to detect updates
-- Returns group → Dev Spaces URL mappings
+- Supports comma-separated group keys with AND logic (e.g. `"team-alpha, team-beta"` requires membership in both groups)
+- `getMatchingMappings(List<String> userGroups)` — returns all entries whose key matches via AND logic
+- `matchesAllGroups(String groupKey, List<String> userGroups)` — static helper; package-private for unit testing
 
 **OpenShiftGroupService** (`OpenShiftGroupService.java`)
 - Initializes Fabric8 OpenShiftClient using service account token
@@ -167,17 +169,19 @@ The Fabric8 OpenShiftClient auto-discovers configuration:
 
 **openshift/configmap.yaml:**
 - Edit `group-mapping.json` to add/modify group → URL mappings
+- Keys may be a single group name or a comma-separated list; comma-separated keys require the user to belong to **all** listed groups (AND logic)
 - Changes are auto-detected without pod restart
 
 ## REST API Endpoints
 
 - `GET /api/group-mapping` - Returns all group-to-URL mappings (JSON)
 - `GET /api/groups` - Lists all OpenShift groups
-- `GET /api/userinfo` - Returns user info from OAuth headers
+- `GET /api/user` - Returns user info from OAuth headers including matched Dev Spaces URLs
 
 ## Testing Notes
 
 **GreetingResourceTest** - Basic endpoint tests
 **NotFoundRedirectFilterTest** - Validates 404 → redirect behavior
+**GroupMappingServiceTest** - Unit tests for multi-group AND matching logic (no Quarkus context needed; tests `matchesAllGroups` directly)
 
 When writing tests for components that use OpenShiftClient, consider mocking the client or using test profiles with mock data.

@@ -14,7 +14,7 @@ In enterprise environments with multiple OpenShift Dev Spaces deployments across
 
 1. **Authenticating users** via OpenShift OAuth Proxy
 2. **Querying OpenShift groups** to determine user membership
-3. **Mapping groups to Dev Spaces URLs** using a configurable mapping
+3. **Mapping groups to Dev Spaces URLs** using a configurable mapping (supports comma-separated AND conditions for fine-grained access control)
 4. **Automatically redirecting** users to their designated Dev Spaces instance
 
 ## 🏗️ Architecture
@@ -46,6 +46,7 @@ User Request → OAuth Proxy → Quarkus App → OpenShift API → Group Mapping
 - **ConfigMap-based configuration**: Update group mappings without redeploying
 - **Real-time updates**: Automatically detects ConfigMap changes via symlink resolution
 - **Retry mechanism**: Handles Kubernetes ConfigMap update delays gracefully
+- **Multi-group AND conditions**: Comma-separated keys (e.g. `"team-alpha, team-beta"`) require membership in **all** listed groups; a user matching multiple keys receives access to all corresponding URLs
 
 ### OpenShift Integration
 - **Native group queries**: Direct integration with OpenShift API
@@ -223,11 +224,20 @@ metadata:
 data:
   group-mapping.json: |
     {
-      "team-alpha": "https://devspaces-alpha.example.com",
-      "team-beta": "https://devspaces-beta.example.com",
-      "contractors": "https://devspaces-external.example.com"
+      "team-alpha, team-beta": "https://devspaces-1.example.com",
+      "team-alpha":            "https://devspaces-2.example.com",
+      "contractors":           "https://devspaces-external.example.com"
     }
 ```
+
+Keys are matched using **AND logic**: a comma-separated key like `"team-alpha, team-beta"` requires the user to belong to **both** `team-alpha` and `team-beta`. A user may match multiple keys and will be given access to all corresponding URLs. Single-group keys (e.g. `"team-alpha"`) work as before.
+
+| User | Groups | Accessible instances |
+|------|--------|----------------------|
+| user1 | `team-alpha`, `team-beta` | devspaces-1, devspaces-2 |
+| user2 | `team-alpha` | devspaces-2 only |
+| user3 | `team-beta` | None |
+| user4 | `contractors` | devspaces-external |
 
 **Note**: ConfigMap updates are automatically detected by the application without restart.
 
@@ -273,6 +283,7 @@ mvn test
 Tests include:
 - `GreetingResourceTest`: Basic endpoint testing
 - `NotFoundRedirectFilterTest`: 404 redirect functionality
+- `GroupMappingServiceTest`: Multi-group AND matching logic (single-group, multi-group, partial match, whitespace handling)
 
 ## 📊 Monitoring and Troubleshooting
 
@@ -290,7 +301,7 @@ kubectl logs -f deployment/devspaces-multicluster-redirector -c oauth-proxy
 
 ### Common Issues
 
-1. **User not redirected**: Check if user belongs to any mapped groups
+1. **User not redirected**: Check if user belongs to the required groups; for comma-separated keys the user must be in **all** listed groups
 2. **ConfigMap not updating**: Verify the ConfigMap is mounted at `/etc/config`
 3. **Authentication failures**: Check OAuth proxy configuration and service account permissions
 4. **Group query failures**: Verify ClusterRole and ClusterRoleBinding are correctly applied

@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.List;
+import java.util.Map;
 
 @Path("/api/user")
 public class UserInfoResource {
@@ -44,16 +45,14 @@ public class UserInfoResource {
             }
             userInfo.set("userOpenShiftGroups", userGroupsArray);
 
-            // Find matching Dev Spaces URLs for user's groups
+            // Find matching Dev Spaces URLs using AND logic for comma-separated group keys
             ArrayNode devSpacesMappings = mapper.createArrayNode();
-            for (String group : userGroups) {
-                String devSpacesUrl = groupMappingService.getDevSpacesUrl(group);
-                if (devSpacesUrl != null) {
-                    ObjectNode mapping = mapper.createObjectNode();
-                    mapping.put("group", group);
-                    mapping.put("devSpacesUrl", devSpacesUrl);
-                    devSpacesMappings.add(mapping);
-                }
+            Map<String, String> matchingMappings = groupMappingService.getMatchingMappings(userGroups);
+            for (Map.Entry<String, String> entry : matchingMappings.entrySet()) {
+                ObjectNode mapping = mapper.createObjectNode();
+                mapping.put("group", entry.getKey());
+                mapping.put("devSpacesUrl", entry.getValue());
+                devSpacesMappings.add(mapping);
             }
             userInfo.set("devSpacesMappings", devSpacesMappings);
         }
