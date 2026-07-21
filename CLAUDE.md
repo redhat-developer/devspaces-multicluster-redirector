@@ -85,7 +85,7 @@ kubectl delete -k openshift
 - Tracks file modification times to detect updates
 - Supports comma-separated group keys with AND logic (e.g. `"team-alpha, team-beta"` requires membership in both groups)
 - `getMatchingMappings(List<String> userGroups)` — returns all entries whose key matches via AND logic
-- `matchesAllGroups(String groupKey, List<String> userGroups)` — static helper; package-private for unit testing
+- `matchesAllGroups(String groupKey, Collection<String> userGroups)` — static helper; package-private for unit testing
 
 **OpenShiftGroupService** (`OpenShiftGroupService.java`)
 - Initializes Fabric8 OpenShiftClient using service account token
