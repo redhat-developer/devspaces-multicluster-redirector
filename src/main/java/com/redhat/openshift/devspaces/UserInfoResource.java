@@ -4,6 +4,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.CacheControl;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
@@ -50,13 +51,22 @@ public class UserInfoResource {
             Map<String, String> matchingMappings = groupMappingService.getMatchingMappings(userGroups);
             for (Map.Entry<String, String> entry : matchingMappings.entrySet()) {
                 ObjectNode mapping = mapper.createObjectNode();
-                mapping.put("group", entry.getKey());
+                mapping.put("groupKey", entry.getKey());
                 mapping.put("devSpacesUrl", entry.getValue());
                 devSpacesMappings.add(mapping);
             }
             userInfo.set("devSpacesMappings", devSpacesMappings);
         }
 
-        return Response.ok(userInfo).build();
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setNoCache(true);
+        cacheControl.setNoStore(true);
+        cacheControl.setMustRevalidate(true);
+
+        return Response.ok(userInfo)
+                .cacheControl(cacheControl)
+                .header("Pragma", "no-cache")
+                .header("Expires", "0")
+                .build();
     }
 }

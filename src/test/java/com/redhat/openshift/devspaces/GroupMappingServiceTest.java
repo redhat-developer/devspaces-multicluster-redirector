@@ -63,4 +63,28 @@ class GroupMappingServiceTest {
         List<String> userGroups = Arrays.asList("team-alpha", "team-beta");
         assertFalse(GroupMappingService.matchesAllGroups("team-alpha, team-beta, contractors", userGroups));
     }
+
+    @Test
+    void emptyKey_noMatch() {
+        List<String> userGroups = Arrays.asList("team-alpha");
+        assertFalse(GroupMappingService.matchesAllGroups("", userGroups));
+    }
+
+    @Test
+    void commaOnlyKey_noMatch() {
+        List<String> userGroups = Arrays.asList("team-alpha");
+        assertFalse(GroupMappingService.matchesAllGroups(",", userGroups));
+    }
+
+    @Test
+    void blankWithCommaKey_noMatch() {
+        List<String> userGroups = Arrays.asList("team-alpha");
+        assertFalse(GroupMappingService.matchesAllGroups(" , ", userGroups));
+    }
+
+    @Test
+    void whitespaceOnlyKey_noMatch() {
+        List<String> userGroups = Arrays.asList("team-alpha");
+        assertFalse(GroupMappingService.matchesAllGroups(" ", userGroups));
+    }
 }
