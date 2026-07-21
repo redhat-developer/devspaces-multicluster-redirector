@@ -135,7 +135,7 @@ function showDevSpacesSelection(mappings) {
     mappings.forEach((mapping, index) => {
         const button = document.createElement('button');
         button.className = 'devspaces-option-button';
-        button.textContent = mapping.group || `Dev Spaces Instance ${index + 1}`;
+        button.textContent = mapping.groupKey || `Dev Spaces Instance ${index + 1}`;
         button.title = mapping.devSpacesUrl || ''; // Show redirect URL on hover
         button.onclick = function() {
             console.log("Selected Dev Spaces URL: ", mapping.devSpacesUrl);
