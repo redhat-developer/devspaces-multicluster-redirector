@@ -151,7 +151,7 @@ The Fabric8 OpenShiftClient auto-discovers configuration:
 
 ## Technology Stack
 
-- **Framework:** Quarkus 3.38.2
+- **Framework:** Quarkus 3.39.5
 - **Java Version:** 17
 - **Build Tool:** Maven
 - **Kubernetes Client:** Fabric8 OpenShift Client 6.13.4
