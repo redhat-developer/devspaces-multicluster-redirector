@@ -186,6 +186,7 @@ This creates:
 - **ClusterRole**: Permissions to list and get groups
 - **ClusterRoleBinding**: Binds the role to the service account
 - **ConfigMap**: Group mapping configuration
+- **ConfigMap**: Trusted CA bundle for the OAuth proxy, populated by the Cluster Network Operator (see [Custom Certificates](#custom-certificates))
 - **Secret**: OAuth proxy session secret
 - **Deployment**: Application with OAuth proxy sidecar
 - **Service**: Internal service on port 8443
@@ -252,6 +253,52 @@ rules:
     verbs: ["get", "list"]
 ```
 
+#### Custom Certificates
+
+There are three independent TLS surfaces. Two are handled automatically; the third is opt-in.
+
+**1. Clusters using a private/corporate CA (handled automatically)**
+
+The OAuth Proxy verifies the OpenShift OAuth server over its *public* ingress URL. By default `oauth-proxy` trusts only `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`, so on a cluster whose ingress certificate is issued by a private CA, login fails with `x509: certificate signed by unknown authority`.
+
+The deployment covers this via [`openshift/trusted-ca-configmap.yaml`](openshift/trusted-ca-configmap.yaml):
+
+- An empty ConfigMap labelled `config.openshift.io/inject-trusted-cabundle: "true"`
+- The Cluster Network Operator injects a `ca-bundle.crt` key containing the system CA bundle merged with any CA configured in `proxies.config.openshift.io/cluster`
+- That bundle is mounted read-only into the sidecar at `/etc/pki/trusted-ca` and passed as `-openshift-ca`, alongside the service account CA
+
+To register your own CA cluster-wide:
+
+```bash
+oc create configmap custom-ca \
+  --from-file=ca-bundle.crt=/path/to/your-ca.crt \
+  -n openshift-config
+
+oc patch proxy/cluster --type=merge \
+  -p '{"spec":{"trustedCA":{"name":"custom-ca"}}}'
+```
+
+The operator propagates the CA into the redirector's ConfigMap automatically. The sidecar reads the bundle only at startup, so restart the pod to pick up a changed CA:
+
+```bash
+oc rollout restart deployment/devspaces-multicluster-redirector
+```
+
+**2. Application → OpenShift API (handled automatically)**
+
+`OpenShiftGroupService` builds the Fabric8 client from the in-cluster configuration, which trusts the service account CA at `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`. A custom API server certificate needs no configuration. To point the client at a different bundle, set `KUBERNETES_CERTS_CA_FILE` on the application container — no code change required.
+
+**3. Custom certificate for the redirector's own Route (opt-in)**
+
+`openshift/route.yaml` uses edge termination with no inline certificate, so the Route is served with the cluster's default ingress wildcard certificate. To serve your own certificate instead, use the overlay in [`overlays/custom-route-cert`](overlays/custom-route-cert):
+
+```bash
+# Replace the PEM placeholders and the host, then:
+kubectl apply -k overlays/custom-route-cert
+```
+
+The certificate must be valid for `spec.host`, and that host must match the `serviceaccounts.openshift.io/oauth-redirecturi.primary` annotation on the ServiceAccount (`https://<host>/oauth/callback`), otherwise the OAuth redirect will be rejected.
+
 ## 🔧 Configuration
 
 ### Application Properties
@@ -305,6 +352,15 @@ kubectl logs -f deployment/devspaces-multicluster-redirector -c oauth-proxy
 2. **ConfigMap not updating**: Verify the ConfigMap is mounted at `/etc/config`
 3. **Authentication failures**: Check OAuth proxy configuration and service account permissions
 4. **Group query failures**: Verify ClusterRole and ClusterRoleBinding are correctly applied
+5. **`x509: certificate signed by unknown authority` in the oauth-proxy logs**: The cluster's ingress certificate is issued by a CA the sidecar does not trust. Confirm the bundle was injected and is non-empty, then restart the pod:
+
+   ```bash
+   oc get configmap devspaces-multicluster-redirector-trusted-ca \
+     -o jsonpath='{.data.ca-bundle\.crt}' | head -1
+   ```
+
+   An empty result means the Cluster Network Operator has not injected the bundle — verify the `config.openshift.io/inject-trusted-cabundle: "true"` label is present. See [Custom Certificates](#custom-certificates).
+6. **Pod stuck in `ContainerCreating` with `references non-existent config key: ca-bundle.crt`**: The bundle has not been injected into the ConfigMap yet. On a fresh deploy this is transient — the kubelet retries the mount and the pod starts within seconds of the operator injecting the key. If it persists, check the label as above.
 
 ## 🛠️ Development
 

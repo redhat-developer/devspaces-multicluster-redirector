@@ -1,0 +1,29 @@
+# Replace every placeholder below with real values, keeping the indentation.
+# The certificate must be valid for `spec.host`, and that same host must appear
+# in the ServiceAccount's `serviceaccounts.openshift.io/oauth-redirecturi.primary`
+# annotation as `https://<host>/oauth/callback`.
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: devspaces-multicluster-redirector
+spec:
+  # Hostname the certificate is issued for.
+  host: redirector.apps.example.com
+  tls:
+    termination: edge
+    # Server certificate (PEM).
+    certificate: |
+      -----BEGIN CERTIFICATE-----
+      REPLACE_WITH_SERVER_CERTIFICATE
+      -----END CERTIFICATE-----
+    # Private key matching the certificate above (PEM).
+    key: |
+      -----BEGIN PRIVATE KEY-----
+      REPLACE_WITH_PRIVATE_KEY
+      -----END PRIVATE KEY-----
+    # Issuing CA chain. Remove this field entirely if the certificate is signed
+    # by a publicly trusted CA.
+    caCertificate: |
+      -----BEGIN CERTIFICATE-----
+      REPLACE_WITH_ISSUING_CA_CERTIFICATE
+      -----END CERTIFICATE-----
