@@ -1,0 +1,12 @@
+# Opt-in overlay: serve the Route with your own TLS certificate instead of the
+# cluster's default ingress wildcard certificate.
+#
+#   kubectl apply -k overlays/custom-route-cert
+#
+# Edit route-tls-patch.yaml first - it ships with placeholders, not real PEM.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../openshift
+patches:
+  - path: route-tls-patch.yaml

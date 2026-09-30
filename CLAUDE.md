@@ -48,6 +48,11 @@ mvn package -Dquarkus.container-image.build=true
 kubectl apply -k openshift
 ```
 
+To serve the Route with a custom certificate instead of the cluster's default ingress cert, fill in the placeholders in `overlays/custom-route-cert/route-tls-patch.yaml` and deploy that overlay instead:
+```bash
+kubectl apply -k overlays/custom-route-cert
+```
+
 **Container Images:**
 - **Development (Upstream):** `quay.io/redhat-developer/devspaces-multicluster-redirector:latest`
 - **Production (Downstream):** `registry.redhat.io/devspaces/multicluster-redirector-rhel9:latest`
@@ -124,6 +129,14 @@ kubectl delete -k openshift
 - Upstream: `http://localhost:8080`
 - Passes user headers to application
 - Session secret from Secret `devspaces-multicluster-redirector-session-secret`
+- Trusts two CA bundles via repeated `-openshift-ca` flags: the injected cluster bundle at `/etc/pki/trusted-ca/ca-bundle.crt` and the service account CA. The flag's default is the service account CA *only*, so both must be listed explicitly — dropping the injected bundle breaks login on clusters with a private-CA ingress certificate.
+
+**Custom Certificates:**
+- ConfigMap `devspaces-multicluster-redirector-trusted-ca` (`openshift/trusted-ca-configmap.yaml`) carries no data; it is labelled `config.openshift.io/inject-trusted-cabundle: "true"` and the Cluster Network Operator injects `ca-bundle.crt` (system CAs + `proxies.config.openshift.io/cluster` trustedCA)
+- The sidecar reads the bundle once at startup — a changed CA requires a pod restart, not just a ConfigMap update
+- `oauth-proxy` does **not** validate the `-openshift-ca` paths at startup: it starts and serves normally even when a path does not exist, and the misconfiguration only surfaces as `x509: certificate signed by unknown authority` at login. The volume projects `ca-bundle.crt` without `optional: true` precisely so the kubelet blocks the pod until the operator has injected the key
+- The Fabric8 client needs no cert configuration (in-cluster config trusts the service account CA); `KUBERNETES_CERTS_CA_FILE` overrides the bundle if ever needed
+- `overlays/custom-route-cert/` is an opt-in kustomize overlay for serving the Route with an inline certificate. It lives outside `openshift/` because kustomize rejects an overlay nested inside the base it references (cycle detection)
 
 ## Important Implementation Details
 
@@ -183,5 +196,6 @@ The Fabric8 OpenShiftClient auto-discovers configuration:
 **GreetingResourceTest** - Basic endpoint tests
 **NotFoundRedirectFilterTest** - Validates 404 → redirect behavior
 **GroupMappingServiceTest** - Unit tests for multi-group AND matching logic (no Quarkus context needed; tests `matchesAllGroups` directly)
+**CustomCertificateManifestTest** - Parses the YAML manifests with the Fabric8 model (no cluster or Quarkus context) and guards the custom certificate wiring: the injected-CA ConfigMap label, the sidecar volume/mount, both `-openshift-ca` paths (the flagged path is derived from the mount, so renaming either side fails), and the custom-Route-certificate overlay. Manifests are read relative to `basedir`
 
 When writing tests for components that use OpenShiftClient, consider mocking the client or using test profiles with mock data.
