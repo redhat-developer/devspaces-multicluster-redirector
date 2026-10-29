@@ -1,0 +1,44 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      quarkus:
+        patterns:
+          - "io.quarkus:*"
+      fabric8:
+        patterns:
+          - "io.fabric8:*"
+      jackson:
+        patterns:
+          - "com.fasterxml.jackson*:*"
+      netty:
+        patterns:
+          - "io.netty:*"
+      test-dependencies:
+        patterns:
+          - "io.rest-assured:*"
+          - "org.junit*:*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
