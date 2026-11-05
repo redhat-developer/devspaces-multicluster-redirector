@@ -1,0 +1,15 @@
+# Cluster-wide trusted CA bundle for the OAuth Proxy sidecar.
+#
+# The Cluster Network Operator watches for the label below and injects a
+# `ca-bundle.crt` key holding the system CA bundle merged with any custom CAs
+# configured in `proxies.config.openshift.io/cluster` (`spec.trustedCA`).
+#
+# Leave `data` empty: it is populated and kept up to date by the operator.
+# Without this, the OAuth Proxy only trusts the service account CA and cannot
+# verify an OAuth server served with a certificate from a private CA.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: devspaces-multicluster-redirector-trusted-ca
+  labels:
+    config.openshift.io/inject-trusted-cabundle: "true"

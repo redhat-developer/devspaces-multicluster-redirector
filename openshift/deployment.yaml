@@ -44,16 +44,29 @@ spec:
                 -scope=user:info \
                 -pass-user-headers \
                 -openshift-service-account=devspaces-multicluster-redirector \
+                -openshift-ca=/etc/pki/trusted-ca/ca-bundle.crt \
+                -openshift-ca=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
                 -client-id=system:serviceaccount:${NAMESPACE}:devspaces-multicluster-redirector \
                 -client-secret-file=/var/run/secrets/kubernetes.io/serviceaccount/token \
                 -cookie-secret-file=/etc/proxy/secrets/session_secret
           volumeMounts:
             - name: session-secret
               mountPath: /etc/proxy/secrets
+            - name: trusted-ca
+              mountPath: /etc/pki/trusted-ca
+              readOnly: true
       volumes:
         - name: session-secret
           secret:
             secretName: devspaces-multicluster-redirector-session-secret
+        # Injected by the Cluster Network Operator: system CAs + any custom CA
+        # from the cluster-wide proxy config. See trusted-ca-configmap.yaml.
+        - name: trusted-ca
+          configMap:
+            name: devspaces-multicluster-redirector-trusted-ca
+            items:
+              - key: ca-bundle.crt
+                path: ca-bundle.crt
         - name: group-mapping
           configMap:
             name: devspaces-openshift-group-mapping
